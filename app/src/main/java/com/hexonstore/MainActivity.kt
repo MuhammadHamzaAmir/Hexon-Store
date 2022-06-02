@@ -16,6 +16,7 @@ import com.google.firebase.ktx.Firebase
 import com.hexonstore.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 private const val TAG = "MainActivity"
@@ -23,10 +24,19 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-
+    private val fireStoreAPI = FireStoreAPI()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO){
+
+                val productsList = fireStoreAPI.getProducts()
+                Log.d(TAG, "Products: $productsList")
+
+            }
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

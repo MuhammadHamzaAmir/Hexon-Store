@@ -2,7 +2,7 @@ package com.hexonstore
 
 interface Products {
 
-    fun getProducts(): List<Product>
+    suspend fun getProducts(): List<Product>
     fun getProduct(id: String): Product
     fun addProduct(product: Product)
     fun updateProduct(product: Product)
