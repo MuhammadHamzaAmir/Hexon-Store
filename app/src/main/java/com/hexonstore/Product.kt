@@ -21,7 +21,9 @@ data class Product(
     @SerialName("brand")
     val brand: String,
     @SerialName("category")
-    val category: String
+    val category: String,
+    @SerialName("id")
+    val id: String
 )
 //class Product()  {
 //    lateinit var id: String     // 'document id'

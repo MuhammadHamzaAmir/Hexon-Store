@@ -7,9 +7,9 @@ interface Products {
     fun addProduct(product: Product)
     fun updateProduct(product: Product)
     fun deleteProduct(id: String)
-    fun getProductsByCategory(category: String): List<Product>
+    suspend fun getProductsByCategory(category: String): List<Product>
     fun getProductsByCategory(category: String, page: Int, pageSize: Int): List<Product>
-    fun getProductsByBrand(brand: String): List<Product>
+    suspend fun getProductsByBrand(brand: String): List<Product>
     fun getProductsByBrand(brand: String, page: Int, pageSize: Int): List<Product>
     
 }
