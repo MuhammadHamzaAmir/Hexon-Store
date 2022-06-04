@@ -21,8 +21,10 @@ class FireStoreAPI : Products {
             data.forEach {
                 productsCategoryName.add(it.id)
                 val allProducts = getProductsByCategory(it.id)
-                Log.d(TAG, "Products: $allProducts")
-                //products.add(it.toObject(Product::class.java))
+                if (allProducts.isNotEmpty()) {
+                    products.addAll(allProducts)
+                }
+
             }
         } catch (e: Exception) {
             Log.d(TAG, "Error getting documents: ", e)
@@ -50,24 +52,39 @@ class FireStoreAPI : Products {
 
     override suspend fun getProductsByCategory(category: String): List<Product> {
         val products = mutableListOf<Product>()
-        val productsName = mutableListOf<String>()
         try {
             val data = db.collection("products").document(category).collection("all")
                 .get().await()
-            data.forEach {
-                val brandNameReference:DocumentReference = it.data["brand"] as DocumentReference
-                val brandName = db.collection("brands").document(brandNameReference.toString())
-                    .get().await()
-                Log.d(TAG, "Product brand ${brandName.id} ==> ${brandNameReference.id}")
+            if (!(data.isEmpty)) {
+                data.forEach {
+                    var product = it
+                    var productData = product.data
+                    productData["id"] = it.id
+                    val brandNameReference: DocumentReference =
+                        it.data["brand"] as DocumentReference
+                    productData.remove("brand")
+                    productData["brand"] = brandNameReference.id
+                    productData["category"] = category
 
-//                productsName.add(it.id)
-//                Log.d(TAG, "Product Name ${it.id} ==> ${it.data}")
-                //products.add(it.toObject(Product::class.java))
+
+                    products.add(
+                        Product(
+                            productData["in stock"].toString().toLong(),
+                            productData["price"].toString().toDouble(),
+                            productData["product code"] as String,
+                            productData["name"] as String,
+                            productData["image link"] as String,
+                            productData["id"] as String,
+                            productData["category"] as String,
+                            productData["brand"] as String,
+                            productData["descp"] as String,
+                        )
+                    )
+                }
             }
         } catch (e: Exception) {
             Log.d(TAG, "Error getting documents: ", e)
         }
-        Log.d(TAG, "Products Names List $productsName")
 
         return products
     }
@@ -84,4 +101,8 @@ class FireStoreAPI : Products {
         TODO("Not yet implemented")
     }
 
+}
+
+private fun <E> MutableList<E>.add(element: Pair<MutableMap<String, Any>, Class<E>>) {
+    element.first.entries.map { element.second.getConstructor(it.value::class.java).newInstance(it.value) }
 }
